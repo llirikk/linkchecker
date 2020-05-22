@@ -130,7 +130,8 @@ class HttpUrl(internpaturl.InternPatternUrl, proxysupport.ProxySupport):
         request = self.build_request()
         self.send_request(request)
         self._add_response_info()
-        self.follow_redirections(request)
+        if self.allows_follow_redirects():
+            self.follow_redirections(request)
         self.check_response()
         if self.allows_simple_recursion():
             self.parse_header_links()
@@ -283,18 +284,21 @@ class HttpUrl(internpaturl.InternPatternUrl, proxysupport.ProxySupport):
 
     def check_response(self):
         """Check final result and log it."""
-        if self.url_connection.status_code >= 400:
+        if self.url_connection.status_code == 204:
+            # no content
+            self.add_warning(self.url_connection.reason,
+                                tag=WARN_HTTP_EMPTY_CONTENT)
+        elif self.url_connection.status_code >= 400:
+            self.set_result("%d %s" % (self.url_connection.status_code, self.url_connection.reason),
+                valid=False)
+        elif 400 > self.url_connection.status_code >= 300:
             self.set_result("%d %s" % (self.url_connection.status_code, self.url_connection.reason),
                             valid=False)
+            self.add_info("Redirected to %s" % (self.url_connection.headers.get("Location", "")))
+        elif 300 > self.url_connection.status_code >= 200:
+            self.set_result("%r %s" % (self.url_connection.status_code, self.url_connection.reason))
         else:
-            if self.url_connection.status_code == 204:
-                # no content
-                self.add_warning(self.url_connection.reason,
-                                 tag=WARN_HTTP_EMPTY_CONTENT)
-            if self.url_connection.status_code >= 200:
-                self.set_result("%r %s" % (self.url_connection.status_code, self.url_connection.reason))
-            else:
-                self.set_result(_("OK"))
+            self.set_result(_("OK"))
 
     def get_content(self):
         if self.text is None:
