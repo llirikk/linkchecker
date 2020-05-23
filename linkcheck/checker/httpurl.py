@@ -128,7 +128,17 @@ class HttpUrl(internpaturl.InternPatternUrl, proxysupport.ProxySupport):
             return
         # check the http connection
         request = self.build_request()
-        self.send_request(request)
+
+        # retryable send
+        tries = 3
+        while tries:
+            try:
+                self.send_request(request)
+            except ConnectionError as err:
+                tries -= 1
+                if not tries:
+                    raise err
+
         self._add_response_info()
         self.follow_redirections(request)
         self.check_response()
