@@ -559,6 +559,15 @@ class UrlBase:
             return False
         log.debug(LOG_CHECK, "... yes, recursion.")
         return True
+    
+    def allows_follow_redirects(self):
+        """Check following redirects."""
+        allow_redirects = self.aggregate.config["followredirects"]
+        log.debug(LOG_CHECK, "Check if following redirections allowed %r", self.url)
+        if not allow_redirects:
+            log.debug(LOG_CHECK, "... no, no following redirects")
+            return False
+        return True
 
     def content_allows_robots(self):
         """Returns True: only check robots.txt on HTTP links."""
