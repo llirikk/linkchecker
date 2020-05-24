@@ -18,7 +18,7 @@
 Check HTML pages for broken links. This is the commandline
 client. Run this file with the -h option to see how it's done.
 """
-from api import run
+from linkcheck import api
 
 if __name__ == '__main__':
-    run()
+    api.run()
