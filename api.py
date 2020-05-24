@@ -1,28 +1,29 @@
-def run():
-    import sys
-    import codecs
-    import os
-    import pprint
-    import getpass
-    # installs _() and _n() gettext functions into global namespace
-    import linkcheck
-    from linkcheck import logconf, LOG_CMDLINE
-    logconf.init_log_config()
-    # override argparse gettext method with the one from linkcheck.init_i18n()
-    #argparse._ = _
-    # now import the rest of the linkchecker gang
-    from linkcheck.cmdline import print_version, print_usage, aggregate_url, \
-    LCArgumentParser, print_plugins
-    from linkcheck import log, i18n, strformat
-    import linkcheck.checker
-    import linkcheck.configuration
-    import linkcheck.fileutil
-    import linkcheck.logger
-    import linkcheck.ansicolor
-    from linkcheck.director import console, check_urls, get_aggregate
+import sys
+import codecs
+import os
+import pprint
+import getpass
+# installs _() and _n() gettext functions into global namespace
+import linkcheck
 
-    from utils import Map
-    # optional modules
+from linkcheck import logconf, LOG_CMDLINE
+logconf.init_log_config()
+# override argparse gettext method with the one from linkcheck.init_i18n()
+#argparse._ = _
+# now import the rest of the linkchecker gang
+from linkcheck.cmdline import print_version, print_usage, aggregate_url, \
+    LCArgumentParser, print_plugins
+from linkcheck import log, i18n, strformat
+import linkcheck.checker
+import linkcheck.configuration
+import linkcheck.fileutil
+import linkcheck.logger
+from linkcheck.director import console, check_urls, get_aggregate
+from utils import Map
+
+
+def run(options=None):
+    import linkcheck.ansicolor # TODO breaks scope
 
     has_profile = linkcheck.fileutil.has_module("yappi")
     has_meliae = linkcheck.fileutil.has_module("meliae")
@@ -58,11 +59,10 @@ def run():
                         log.info(LOG_CMDLINE, "Read %d URLs from stdin", num)
                     yield url
 
-
-    # read and parse command line options and arguments
-    options = Map({'configfile': './developrc', 'url': ['www.example.com']})
-    # from argparser import argparser
-    # options = argparser.parse_args()
+    if not options:
+        # read and parse command line options and arguments
+        from argparser import argparser
+        options = argparser.parse_args()
 
     # initialize logging
     if options.debug:
