@@ -19,45 +19,43 @@ import linkcheck.configuration
 import linkcheck.fileutil
 import linkcheck.logger
 from linkcheck.director import console, check_urls, get_aggregate
-from utils import Map
 
+has_profile = linkcheck.fileutil.has_module("yappi")
+has_meliae = linkcheck.fileutil.has_module("meliae")
+
+# default profiling filename
+_profile = "linkchecker.prof"
+_username = None
+_password = None
+
+def has_encoding(encoding):
+    """Detect if Python can encode in a certain encoding."""
+    try:
+        codecs.lookup(encoding)
+        return True
+    except LookupError:
+        return False
+
+def read_stdin_urls():
+    """Read list of URLs, separated by white-space, from stdin."""
+    num = 0
+    while True:
+        lines = sys.stdin.readlines(8 * 1024)
+        if not lines:
+            break
+        for line in lines:
+            for url in line.split():
+                num += 1
+                if num % 10000 == 0:
+                    log.info(LOG_CMDLINE, "Read %d URLs from stdin", num)
+                yield url
 
 def run(options=None):
     import linkcheck.ansicolor # TODO breaks scope
 
-    has_profile = linkcheck.fileutil.has_module("yappi")
-    has_meliae = linkcheck.fileutil.has_module("meliae")
-
-    # default profiling filename
-    _profile = "linkchecker.prof"
-    _username = None
-    _password = None
-
-    def has_encoding(encoding):
-        """Detect if Python can encode in a certain encoding."""
-        try:
-            codecs.lookup(encoding)
-            return True
-        except LookupError:
-            return False
-
     # build a config object for this check session
     config = linkcheck.configuration.Configuration()
     config.set_status_logger(console.StatusLogger())
-
-    def read_stdin_urls():
-        """Read list of URLs, separated by white-space, from stdin."""
-        num = 0
-        while True:
-            lines = sys.stdin.readlines(8 * 1024)
-            if not lines:
-                break
-            for line in lines:
-                for url in line.split():
-                    num += 1
-                    if num % 10000 == 0:
-                        log.info(LOG_CMDLINE, "Read %d URLs from stdin", num)
-                    yield url
 
     if not options:
         # read and parse command line options and arguments
