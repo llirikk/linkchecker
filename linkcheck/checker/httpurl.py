@@ -131,9 +131,11 @@ class HttpUrl(internpaturl.InternPatternUrl, proxysupport.ProxySupport):
 
         # retryable send
         tries = 3
-        while tries:
+        done = False # race condition ?
+        while tries and not done:
             try:
                 self.send_request(request)
+                done = True
             except ConnectionError as err:
                 tries -= 1
                 if not tries:
