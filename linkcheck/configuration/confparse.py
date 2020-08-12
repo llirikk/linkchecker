@@ -141,6 +141,7 @@ class LCConfigParser(RawConfigParser):
         self.read_int_option(section, "followredirects", min=0)
         self.read_string_option(section, "nntpserver")
         self.read_string_option(section, "useragent")
+        self.read_boolean_option(section, "exitnonzero")
         self.read_int_option(section, "maxrequestspersecond", min=1)
         self.read_int_option(section, "maxnumurls", min=0)
         self.read_int_option(section, "maxfilesizeparse", min=1)

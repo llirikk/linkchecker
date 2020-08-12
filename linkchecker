@@ -618,5 +618,5 @@ stats = config['logger'].stats
 if stats.internal_errors:
     sys.exit(2)
 # on errors or printed warnings, exit with status 1
-if stats.errors or (stats.warnings_printed and config['warnings']):
+if config["exitnonzero"] and (stats.errors or (stats.warnings_printed and config['warnings'])):
     sys.exit(1)
