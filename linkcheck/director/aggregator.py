@@ -26,7 +26,7 @@ from .. import log, LOG_CHECK, strformat, LinkCheckerError
 from ..decorators import synchronized
 from ..cache import urlqueue
 from ..htmlutil import loginformsearch
-from ..cookies import from_file
+from ..cookies import from_file, from_options
 from . import logger, status, checker, interrupt
 
 
@@ -45,6 +45,9 @@ def new_request_session(config, cookies):
     })
     if config["cookiefile"]:
         for cookie in from_file(config["cookiefile"]):
+            session.cookies.set_cookie(cookie)
+    if config.get("setcookie"):
+        for cookie in from_options(config["setcookie"]):
             session.cookies.set_cookie(cookie)
     return session
 

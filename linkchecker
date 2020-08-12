@@ -316,6 +316,7 @@ group.add_argument("-a", "--anchors", action="store_true", dest="anchors",
 # XXX deprecated: replaced with requests session cookie handling
 group.add_argument("-C", "--cookies", action="store_true", dest="cookies",
                  help=argparse.SUPPRESS)
+group.add_argument("--setcookie", dest="setcookie", metavar="STRING")
 group.add_argument("--cookiefile", dest="cookiefile", metavar="FILENAME",
                  help=_(
 """Read a file with initial cookie data. The cookie data format is
@@ -544,6 +545,8 @@ for entry in config["authentication"]:
         entry["password"] = getpass.getpass(msg)
 if options.useragent is not None:
     config["useragent"] = options.useragent
+if options.setcookie is not None:
+    config["setcookie"] = options.setcookie
 if options.cookiefile is not None:
     if linkcheck.fileutil.is_readable(options.cookiefile):
         config["cookiefile"] = options.cookiefile
