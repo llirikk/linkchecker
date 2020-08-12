@@ -42,6 +42,14 @@ def from_file(filename):
             entries.extend(from_headers("\r\n".join(lines)))
         return entries
 
+def from_options(optstring):
+    res = []
+    for pair in optstring.split(";"):
+        name, value = pair.split("=")
+        cookie = requests.cookies.create_cookie(name, value)
+        res.append(cookie)
+    return res
+
 
 def from_headers(strheader):
     """Parse cookie data from a string in HTTP header (RFC 2616) format.
